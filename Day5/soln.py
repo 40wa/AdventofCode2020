@@ -1,7 +1,4 @@
 
-def get_seatloc(d):
-    print(d)
-
 def string_to_binary(targstring, oneletter):
     init = 0b1
     acum = 0

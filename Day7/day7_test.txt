@@ -1,0 +1,3 @@
+clear yellow bags contain 1 clear red bag.
+clear red bags contain 1 clear blue bag.
+clear blue bags contain 1 clear yellow bag.

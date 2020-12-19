@@ -1,0 +1,67 @@
+
+def eval_prod(rule, t, idx, ctx):
+    accum = 0
+    for r in rule:
+        inter = check(r, t, idx, ctx)
+        if inter != 0:
+            idx += inter
+            accum += inter
+        else:
+            return 0
+    return accum
+
+def eval_sum(rule, t, idx, ctx):
+    for r in rule:
+        ret = check(r, t, idx, ctx)
+        if ret:
+            return ret
+    return 0
+
+def eval_base(rule, t, idx=0, ctx=None):
+    if len(t) - idx >= len(rule):
+        return all((t[idx+i] == rule[i] for i in range(len(rule)))) * len(rule)
+    else:
+        return 0
+
+# 0: 2 3 | 3 2 encoded as (0, [(2,3),(3,2)])
+# ctx is db of rules
+def check(rule, t, idx=0, ctx=None):
+    if isinstance(rule, tuple):
+        return eval_prod(rule, t, idx, ctx)
+    elif isinstance(rule, list):
+        return eval_sum(rule, t, idx, ctx)
+    elif isinstance(rule, str):
+        return eval_base(rule, t, idx, ctx)
+    elif isinstance(rule, int):
+        return check(ctx[rule], t, idx, ctx)
+
+def parse(rules):
+    ret = dict()
+    for r in rules:
+        s = r.split(':')
+        if s[1][1] == '"':
+            v = s[1][2]
+        elif len(s[1].split('|')) == 1:
+            v = tuple([int(n) for n in s[1].split()])
+        else:
+            v = [tuple([int(n) for n in r.split()]) for r in s[1].split('|')]
+        ret[int(s[0])] = v
+    return ret 
+
+def main():
+    with open('test2') as f: data = f.read().split('\n\n')
+    
+    print('Part One')
+    ctx = parse(data[0].split('\n'))
+    ipts = data[1].split()
+    print(sum(int(check(0, d, 0, ctx) == len(d)) for d in ipts))
+
+    print('Part Two')
+    ctx[8] = [42, (42, 8)]
+    ctx[11] = [(42, 31), (42, 11, 31)]
+    #print(sum(int(check(0, d, 0, ctx) == len(d)) for d in ipts))
+    for d in ipts:
+        print(int(check(0,d,0,ctx) == len(d)), d)
+
+if __name__=='__main__':
+    main()

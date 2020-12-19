@@ -73,15 +73,13 @@ def all_strings(rule, ctx):
         return {rule}
 
 
-def check_p2(t, sctr=0, cont=[]):
+def check_p2(t, sctr=0):
     for w in v_42:
         if t.startswith(w):
-            cont.append(w)
-            res = check_p2(t[len(w):], sctr + 1, cont)
+            res = check_p2(t[len(w):], sctr + 1)
             if res:
                 return res
 
-    lasters = []
     toggle = True
     lctr = 0
     while toggle:
@@ -90,7 +88,6 @@ def check_p2(t, sctr=0, cont=[]):
         toggle = False
         for w in v_31:
             if t.endswith(w):
-                lasters.insert(0, w)
                 lctr += 1
                 t = t[:len(t) - len(w)]
                 toggle = True

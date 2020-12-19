@@ -1,4 +1,5 @@
 import re
+import time
 
 def repl_p1(line):
     tokend = line.replace(' ','')
@@ -88,10 +89,18 @@ def main():
     with open('data') as f: data = f.read().strip().split('\n')
     
     print("Part One")
-    print(sum(repl_p1(d) for d in data))
+    tic = time.perf_counter()
+    res = sum(repl_p1(d) for d in data)
+    toc = time.perf_counter()
+    print(res)
+    print('time elapsed: ', toc - tic)
 
     print("Part Two")
-    print(sum(repl_p2(d) for d in data))
+    tic = time.perf_counter()
+    res = sum(repl_p2(d) for d in data)
+    toc = time.perf_counter()
+    print(res)
+    print('time elapsed: ', toc - tic)
 
 if __name__=="__main__":
     main()

@@ -1,3 +1,16 @@
+def parse(rules):
+    ret = dict()
+    for r in rules:
+        s = r.split(':')
+        if s[1][1] == '"':
+            v = s[1][2]
+        elif len(s[1].split('|')) == 1:
+            v = tuple([int(n) for n in s[1].split()])
+        else:
+            v = [tuple([int(n) for n in r.split()]) for r in s[1].split('|')]
+        ret[int(s[0])] = v
+    return ret 
+
 
 def eval_prod(rule, t, idx, ctx):
     accum = 0
@@ -35,33 +48,69 @@ def check(rule, t, idx=0, ctx=None):
     elif isinstance(rule, int):
         return check(ctx[rule], t, idx, ctx)
 
-def parse(rules):
-    ret = dict()
-    for r in rules:
-        s = r.split(':')
-        if s[1][1] == '"':
-            v = s[1][2]
-        elif len(s[1].split('|')) == 1:
-            v = tuple([int(n) for n in s[1].split()])
-        else:
-            v = [tuple([int(n) for n in r.split()]) for r in s[1].split('|')]
-        ret[int(s[0])] = v
-    return ret 
+def all_strings(rule, ctx):
+    if isinstance(rule, tuple):
+        ret = None
+        for r in rule:
+            res = all_strings(r, ctx)
+            if not ret:
+                ret = res
+            else:
+                tmp = set()
+                for s in ret:
+                    for a in res:
+                        tmp.add(s+a)
+                ret = tmp
+        return ret
+    if isinstance(rule, list):
+        ret = set()
+        for r in rule:
+            ret = ret.union(all_strings(r, ctx))
+        return ret
+    if isinstance(rule, int):
+        return all_strings(ctx[rule], ctx)
+    if isinstance(rule, str):
+        return {rule}
+
+
+def check_p2(t, sctr=0, cont=[]):
+    for w in v_42:
+        if t.startswith(w):
+            cont.append(w)
+            res = check_p2(t[len(w):], sctr + 1, cont)
+            if res:
+                return res
+
+    lasters = []
+    toggle = True
+    lctr = 0
+    while toggle:
+        if len(t) == 0 and sctr > lctr and lctr > 0:
+            return True
+        toggle = False
+        for w in v_31:
+            if t.endswith(w):
+                lasters.insert(0, w)
+                lctr += 1
+                t = t[:len(t) - len(w)]
+                toggle = True
+                break
+
+    return False
+
+with open('data') as f: data = f.read().split('\n\n')
+ctx = parse(data[0].split('\n'))
+ipts = data[1].split()
+v_42 = all_strings(42, ctx)
+v_31 = all_strings(31, ctx)
 
 def main():
-    with open('test2') as f: data = f.read().split('\n\n')
     
     print('Part One')
-    ctx = parse(data[0].split('\n'))
-    ipts = data[1].split()
     print(sum(int(check(0, d, 0, ctx) == len(d)) for d in ipts))
 
     print('Part Two')
-    ctx[8] = [42, (42, 8)]
-    ctx[11] = [(42, 31), (42, 11, 31)]
-    #print(sum(int(check(0, d, 0, ctx) == len(d)) for d in ipts))
-    for d in ipts:
-        print(int(check(0,d,0,ctx) == len(d)), d)
+    print(sum(int(check_p2(d)) for d in ipts))
 
 if __name__=='__main__':
     main()

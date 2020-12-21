@@ -190,7 +190,7 @@ class Cell:
 def rotate_img(img, n):
     ret = img
     for _ in range(n):
-        ret = np.rot90(img, k=3).tolist()
+        ret = np.rot90(ret, k=3).tolist()
     return ret 
 
 def reflect_img(img, flip):
@@ -204,7 +204,6 @@ def create_largest(large, largest, parsed):
             flip = little.flip
             num = little.num
             reflectd = reflect_img(parsed[num], flip)
-            #reflectd = parsed[num]
             rotd = rotate_img(reflectd, rot)
             print(i,j, flip, rot)
             largest[i][j] = rotd
@@ -233,8 +232,20 @@ def dump(largest):
             print('\n')
         print('\n')
 
+# kernel is a list of tuple offsets from 0,0
+def kernelsearch(img, kernel, kernelshape):
+    print(len(img), len(img[0]))
+    x,y = kernelshape
+
+    cnt = 0
+    for i in range(len(img) - x):
+        for j in range(len(img[0]) - y):
+            cnt += all(((img[i + s[0]][j + s[1]] == 1 for s in kernel)))
+
+    return cnt
+
 def main():
-    with open('test') as f: data = f.read().split('\n\n')
+    with open('data') as f: data = f.read().split('\n\n')
 
     print("Part One")
     corners = p1_meme(data)
@@ -255,7 +266,43 @@ def main():
     dump(largest)
     
     final = sew(largest)
+
+    for line in final:
+        print(line)
     
+    lochness_kernel = []
+    with open('lochness') as l:
+        lochness = l.read().split('\n')
+        lochness_dims = (len(lochness),len(lochness[0]))
+        for i,row in enumerate(lochness):
+            for j,letter in enumerate(row):
+                if letter == '#':
+                    lochness_kernel.append((i,j))
+
+    m = 0
+    
+    check = kernelsearch(final, lochness_kernel, lochness_dims)
+    print('check ', check)
+    for i in range(4):
+        final = rotate_img(final, 1)
+        check = kernelsearch(final, lochness_kernel, lochness_dims)
+        m = max(check, m)
+        print('check ', check)
+
+    final = reflect_img(final, True)
+    check = kernelsearch(final, lochness_kernel, lochness_dims)
+    print('check ', check)
+    for i in range(4):
+        final = rotate_img(final, 1)
+        check = kernelsearch(final, lochness_kernel, lochness_dims)
+        m = max(check, m)
+        print('check ', check)
+
+    print(m)
+    totalcount = sum(sum(line) for line in final)
+    print(totalcount)
+    print(totalcount - m * 15)
+
 
 if __name__=='__main__':
     main()

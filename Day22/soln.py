@@ -1,4 +1,5 @@
 from collections import deque
+import time
 
 def parse(data):
     a_deck = deque([int(data[i+1]) for i in range((len(data) // 2) - 2)])
@@ -44,9 +45,8 @@ def recstep(a_deck, b_deck):
         if a_deck and b_deck:
             a,b = a_deck.popleft(),b_deck.popleft()
             if (len(a_deck) >= a) and (len(b_deck) >= b):
-                as_deck,bs_deck = a_deck.copy(),b_deck.copy()
-                as_deck = deque([as_deck.popleft() for _ in range(a)])
-                bs_deck = deque([bs_deck.popleft() for _ in range(b)])
+                as_deck = deque((a_deck[i] for i in range(a)))
+                bs_deck = deque((b_deck[i] for i in range(b)))
                 s_res = recstep(as_deck, bs_deck)
                 if s_res == 1:
                     a_deck.extend((a,b))
@@ -68,13 +68,17 @@ def main():
 
     decks = parse(data)
     print("Part One")
+    tic = time.time()
     play(*decks)
-    print(score(decks)) 
+    toc = time.time()
+    print(score(decks), 'elapsed ', toc-tic) 
 
     decks = parse(data)
     print("Part Two")
+    tic = time.time()
     recstep(*decks)
-    print(score(decks))
+    toc = time.time()
+    print(score(decks), 'elapsed ', toc-tic) 
 
 if __name__=="__main__":
     main()

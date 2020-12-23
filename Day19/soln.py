@@ -1,3 +1,5 @@
+import time
+
 def parse(rules):
     ret = dict()
     for r in rules:
@@ -10,7 +12,6 @@ def parse(rules):
             v = [tuple([int(n) for n in r.split()]) for r in s[1].split('|')]
         ret[int(s[0])] = v
     return ret 
-
 
 def eval_prod(rule, t, idx, ctx):
     accum = 0
@@ -104,10 +105,18 @@ v_31 = all_strings(31, ctx)
 def main():
     
     print('Part One')
-    print(sum(int(check(0, d, 0, ctx) == len(d)) for d in ipts))
+    tic = time.time()
+    ret = sum(int(check(0, d, 0, ctx) == len(d)) for d in ipts)
+    toc = time.time()
+    print(ret)
+    print('elapsed: ', toc - tic)
 
     print('Part Two')
-    print(sum(int(check_p2(d)) for d in ipts))
+    tic = time.time()
+    ret = sum(int(check_p2(d)) for d in ipts)
+    toc = time.time()
+    print(ret)
+    print('elapsed: ', toc - tic)
 
 if __name__=='__main__':
     main()
